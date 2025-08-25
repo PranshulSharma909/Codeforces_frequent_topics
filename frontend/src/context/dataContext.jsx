@@ -21,7 +21,7 @@ export const DataProvider = ({ children }) => {
       const indexes = queryParams.get("indexes") || "";
       
       const response = await fetch(
-        `http://localhost:5000/tags/frequency?x=${x}&divs=${divs}&indexes=${indexes}`
+        `https://codeforces-frequent-topics.onrender.com/tags/frequency?x=${x}&divs=${divs}&indexes=${indexes}`
       );
       
       if (!response.ok) {
