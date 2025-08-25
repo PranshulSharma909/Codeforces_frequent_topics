@@ -1,203 +1,180 @@
 import { useNavigate } from "react-router-dom";
 import { useDataContext } from "../context/dataContext.jsx";
+import Header from "../components/Header.jsx"; 
+import Footer from "../components/Footer.jsx"; 
 
 export default function RecentProblemsPage() {
   const navigate = useNavigate();
   const { analysisData } = useDataContext();
   const problems = analysisData?.result?.problems || [];
 
-  // Helper function to format the date
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  // Sort problems by contest date (newest first)
   const sortedProblems = [...problems].sort((a, b) => {
-    const contestA = analysisData.result.filteredContests.find(c => c.id === a.contestId);
-    const contestB = analysisData.result.filteredContests.find(c => c.id === b.contestId);
-    return (contestB?.startTimeSeconds || 0) - (contestA?.startTimeSeconds || 0);
+    if (a.contestId !== b.contestId) {
+      return b.contestId - a.contestId;
+    }
+    return a.index.localeCompare(b.index);
   });
 
-  // Show message if no data is available
+  const formatTags = (tags) => {
+    return tags.map((tag, index) => (
+      <span key={index} className="badge bg-light text-dark me-1 mb-1" style={{
+        fontFamily: "'Inter', sans-serif",
+        fontSize: "0.75rem"
+      }}>
+        {tag}
+      </span>
+    ));
+  };
+
   if (!analysisData) {
     return (
-      <div className="min-vh-100 bg-light">
-        <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-          <div className="container-fluid px-4">
-            <a className="navbar-brand fw-bold fs-4" href="#">
-              <i className="fas fa-code me-2"></i>
-              Codeforces Analytics
-            </a>
-            <div className="collapse navbar-collapse">
-              <ul className="navbar-nav ms-auto">
-                <li className="nav-item">
-                  <button 
-                    className="nav-link btn btn-link text-white fw-semibold"
-                    onClick={() => navigate("/")}
-                  >
-                    <i className="fas fa-home me-1"></i>
-                    Home
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+      <div className="min-vh-100" style={{ background: "linear-gradient(130deg, rgb(119, 162, 215), rgb(83, 163, 83))" }}>
+        <Header />
         <div className="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
           <div className="text-center">
             <div className="card shadow-lg border-0" style={{ maxWidth: "500px" }}>
               <div className="card-body p-5">
-                <i className="fas fa-exclamation-triangle text-warning fs-1 mb-3"></i>
-                <h4 className="card-title text-dark mb-3">No Analysis Data</h4>
-                <p className="card-text text-muted mb-4">
-                  Please run an analysis from the home page first to view problem data.
-                </p>
+                <h4 className="card-title text-dark mb-3" style={{ fontFamily: "'Inter', sans-serif", fontWeight: "600" }}>
+                  No Analysis Data
+                </h4>
                 <button 
                   onClick={() => navigate("/")} 
-                  className="btn btn-primary px-4"
+                  className="btn btn-dark px-4"
+                  style={{ fontFamily: "'Inter', sans-serif", fontWeight: "500" }}
                 >
-                  <i className="fas fa-arrow-left me-2"></i>
                   Go to Home
                 </button>
               </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-vh-100 bg-light">
-      {/* Dashboard Header */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div className="container-fluid px-4">
-          <a className="navbar-brand fw-bold fs-4" href="#">
-            <i className="fas fa-code me-2"></i>
-            Codeforces Analytics
-          </a>
-          <button 
-            className="navbar-toggler" 
-            type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#navbarNav"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <button 
-                  className="nav-link btn btn-link text-white fw-semibold"
-                  onClick={() => navigate("/")}
-                >
-                  <i className="fas fa-home me-1"></i>
-                  Home
-                </button>
-              </li>
-              <li className="nav-item">
-                <button 
-                  className="nav-link btn btn-link text-white fw-semibold"
-                  onClick={() => navigate("/tags/frequency")}
-                >
-                  <i className="fas fa-tags me-1"></i>
-                  Frequent Tags
-                </button>
-              </li>
-              <li className="nav-item">
-                <button 
-                  className="nav-link btn btn-link text-white fw-semibold"
-                  onClick={() => navigate("/recent-contests")}
-                >
-                  <i className="fas fa-trophy me-1"></i>
-                  Recent Contests
-                </button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link btn btn-link text-white fw-semibold active">
-                  <i className="fas fa-puzzle-piece me-1"></i>
-                  Recent Problems
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
+    <div className="min-vh-100" style={{ background: "linear-gradient(130deg, rgb(119, 162, 215), rgb(83, 163, 83))" }}>
+      <Header />
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-lg-10">
             
-            {/* Header Section */}
             <div className="card shadow-lg border-0 rounded-4 mb-4">
-              <div className="card-header bg-gradient bg-primary text-white py-4 rounded-top-4">
-                <div className="d-flex align-items-center justify-content-between">
-                  <div>
-                    <h1 className="h2 fw-bold mb-1">
-                      <i className="fas fa-puzzle-piece me-2"></i>
-                      Recent Problems
-                    </h1>
-                    <p className="mb-0 opacity-75">All problems from your analysis (newest first)</p>
-                  </div>
-                  <button 
-                    onClick={() => navigate("/tags/frequency")} 
-                    className="btn btn-light btn-sm"
-                  >
-                    <i className="fas fa-arrow-left me-1"></i>
-                    Back
-                  </button>
+              <div className="card-header bg-dark text-white py-4 rounded-top-4">
+                <div className="text-center">
+                  <h1 className="h2 fw-bold mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Recent Problems
+                  </h1>
                 </div>
               </div>
+              
               <div className="card-body p-4">
-                <div className="d-flex align-items-center">
-                  <i className="fas fa-list-ol text-primary me-2 fs-4"></i>
-                  <div>
-                    <h4 className="mb-0 fw-bold text-primary">{problems.length}</h4>
-                    <small className="text-muted">Total Problems</small>
-                  </div>
+                <div className="text-center">
+                  <h4 className="mb-0 fw-bold text-dark" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    {problems.length}
+                  </h4>
+                  <small className="text-muted" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Total Problems
+                  </small>
                 </div>
               </div>
             </div>
 
-            {/* Problems List */}
             {problems.length === 0 ? (
               <div className="card shadow-lg border-0 rounded-4">
                 <div className="card-body text-center py-5">
-                  <i className="fas fa-exclamation-triangle text-warning fs-1 mb-3"></i>
-                  <h4 className="text-dark mb-3">No Problems Found</h4>
-                  <p className="text-muted mb-4">
-                    No problem data is available. Please run a new analysis from the home page.
-                  </p>
+                  <h4 className="text-dark mb-3" style={{ fontFamily: "'Inter', sans-serif", fontWeight: "600" }}>
+                    No Problems Found
+                  </h4>
                   <button 
                     onClick={() => navigate("/")} 
-                    className="btn btn-primary px-4"
+                    className="btn btn-dark px-4"
+                    style={{ fontFamily: "'Inter', sans-serif", fontWeight: "500" }}
                   >
-                    <i className="fas fa-home me-2"></i>
                     Go to Home
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="list-group shadow-sm rounded-3">
-                {sortedProblems.map((problem) => (
-                  <div key={`${problem.contestId}-${problem.index}`} className="list-group-item list-group-item-action p-4">
-                    <div className="d-flex w-100 justify-content-between mb-2">
-                      <h5 className="mb-1 fw-bold text-primary">{problem.index}. {problem.name}</h5>
-                      <small className="text-muted">{formatDate(analysisData.result.filteredContests.find(c => c.id === problem.contestId).startTimeSeconds)}</small>
-                    </div>
-                    <p className="mb-2 text-muted">{problem.contestName}</p>
-                    <div className="d-flex flex-wrap gap-2">
-                      {problem.tags.map(tag => (
-                        <span key={tag} className="badge bg-secondary bg-opacity-10 text-dark-emphasis fw-medium">
-                          {tag}
-                        </span>
-                      ))}
+              <div className="row g-4">
+                {sortedProblems.map((problem, index) => (
+                  <div key={`${problem.contestId}-${problem.index}`} className="col-lg-6">
+                    <div className="card shadow-sm border-0 rounded-3 h-100">
+                      <div className="card-body p-4">
+                        
+                        <div className="d-flex justify-content-between align-items-start mb-3">
+                          <span className="badge bg-dark text-white px-2 py-1.5" style={{ 
+                            fontFamily: "'Inter', sans-serif", 
+                            fontWeight: "600",
+                            fontSize: "0.9rem"
+                          }}>
+                            #{index + 1}
+                          </span>
+                        </div>
+                        
+                        <h5 className="card-title fw-bold text-dark mb-2" style={{ 
+                          lineHeight: '1.4',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: "700"
+                        }}>
+                          {problem.name}
+                        </h5>
+                        
+                        {problem.tags && problem.tags.length > 0 && (
+                          <div className="mb-3">
+                            <small className="text-muted d-block mb-2" style={{ fontFamily: "'Inter', sans-serif", fontWeight: "600" }}>
+                              Tags:
+                            </small>
+                            <div className="d-flex flex-wrap">
+                              {formatTags(problem.tags)}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="problem-details">
+                          <div className="row g-3">
+                            <div className="col-12">
+                              <div className="d-flex align-items-center text-muted">
+                                <strong className="me-2" style={{ fontFamily: "'Inter', sans-serif", fontWeight: "600" }}>
+                                  Index:
+                                </strong>
+                                <span className="badge bg-primary text-white px-2 py-1.5" style={{ 
+                                  fontFamily: "'Inter', sans-serif",
+                                  fontWeight: "600",
+                                  fontSize: "0.9rem"
+                                }}>
+                                  {problem.index}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="card-footer bg-transparent border-0 pt-0 pb-4 px-4">
+                        <button
+                          className="btn btn-outline-secondary btn-sm w-100"
+                          onClick={() => window.open(`https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}`, '_blank')}
+                          style={{ 
+                            fontFamily: "'Inter', sans-serif", 
+                            fontWeight: "500",
+                            transition: "all 0.2s ease-in-out"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#5171b4ff";
+                            e.target.style.borderColor = "#5171b4ff";
+                            e.target.style.color = "white";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "";
+                            e.target.style.borderColor = "";
+                            e.target.style.color = "";
+                          }}
+                        >
+                          View on Codeforces
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -208,15 +185,7 @@ export default function RecentProblemsPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-dark text-white py-4 mt-5">
-        <div className="container text-center">
-          <p className="mb-0">
-            <i className="fas fa-heart text-danger me-1"></i>
-            Made for Codeforces enthusiasts
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

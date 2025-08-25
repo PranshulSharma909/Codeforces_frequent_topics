@@ -2,7 +2,7 @@ export default function NumberOfContests({ numContests, setNumContests }) {
   return (
     <>
       <div>
-        <label className="form-label fw-medium">Number of contests</label>
+        <label className="form-label fw-medium bold">Number of contests</label>
         <input
           type="number"
           min="1"
