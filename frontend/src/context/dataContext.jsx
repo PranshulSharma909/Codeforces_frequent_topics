@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 
 const DataContext = createContext();
-// .
+
 export const DataProvider = ({ children }) => {
   const [analysisData, setAnalysisData] = useState(null);
   const [loading, setLoading] = useState(false);
